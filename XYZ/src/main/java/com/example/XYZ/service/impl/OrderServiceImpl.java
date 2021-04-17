@@ -14,7 +14,6 @@ import com.example.XYZ.vo.CreateOrder;
 import com.example.XYZ.vo.OrderVO;
 import com.example.XYZ.vo.ProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,19 +39,8 @@ public class OrderServiceImpl implements OrderService {
 
         Product product = productService.findProductById(createOrder.getProductId());
 
-        BigDecimal totalPrice;
-        if (product.getQuantity() >= createOrder.getQuantity()) {
-            totalPrice = new BigDecimal(String.valueOf(product.getPrice().multiply(new BigDecimal(createOrder.getQuantity()))));
-
-            synchronized (product) {
-                product.setQuantity(product.getQuantity() - createOrder.getQuantity());
-                productService.save(product);
-            }
-        } else {
-            throw new CustomException()
-                    .setStatusCode(HttpStatus.NOT_FOUND)
-                    .setMessage("Available quantity is: " + product.getQuantity());
-        }
+        BigDecimal totalPrice = new BigDecimal(String.valueOf(product.getPrice().multiply(new BigDecimal(createOrder.getQuantity()))));
+        productService.updateProductQuantity(createOrder.getProductId(), createOrder.getQuantity(), '-');
 
         Order order = new Order();
         order.setCustomerId(createOrder.getCustomerId());

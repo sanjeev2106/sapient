@@ -2,9 +2,11 @@ package com.example.XYZ.service.impl;
 
 import com.example.XYZ.entity.Product;
 import com.example.XYZ.enums.Size;
+import com.example.XYZ.exception.CustomException;
 import com.example.XYZ.repository.ProductRepository;
 import com.example.XYZ.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,13 +33,29 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product updateQuantity(Product product) {
-        synchronized (this) {
-            Product p = findProductById(product.getId());
-            p.setQuantity(p.getQuantity() + product.getQuantity());
-            productRepository.save(p);
-            return p;
+    public Product updateQuantity(Product product) throws CustomException {
+        return updateProductQuantity(product.getId(), product.getQuantity(), '+');
+    }
+
+    @Override
+    public synchronized Product updateProductQuantity(Long id, int quantity, char operation) throws CustomException {
+        Product p = findProductById(id);
+        switch (operation) {
+            case '+':
+                p.setQuantity(p.getQuantity() + quantity);
+                break;
+            case '-':
+                if (p.getQuantity() < quantity) {
+                    throw new CustomException()
+                            .setStatusCode(HttpStatus.NOT_FOUND)
+                            .setMessage("Available quantity is: " + p.getQuantity());
+                }
+                p.setQuantity(p.getQuantity() - quantity);
+                break;
         }
+
+        productRepository.save(p);
+        return p;
     }
 
     @Override

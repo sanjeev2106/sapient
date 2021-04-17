@@ -2,6 +2,7 @@ package com.example.XYZ.service;
 
 import com.example.XYZ.entity.Product;
 import com.example.XYZ.enums.Size;
+import com.example.XYZ.exception.CustomException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -12,7 +13,9 @@ public interface ProductService {
 
     Product findProductById(Long id);
 
-    Product updateQuantity(Product product);
+    Product updateQuantity(Product product) throws CustomException;
+
+    Product updateProductQuantity(Long id, int quantity, char operation) throws CustomException;
 
     Map<String, List<Product>> groupByBrand();
 

@@ -2,6 +2,7 @@ package com.example.XYZ.controller;
 
 import com.example.XYZ.entity.Product;
 import com.example.XYZ.enums.Size;
+import com.example.XYZ.exception.CustomException;
 import com.example.XYZ.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class ProductController {
     }
 
     @PostMapping("/addQuantity")
-    public Product updateQuantity(@RequestBody Product product) {
+    public Product updateQuantity(@RequestBody Product product) throws CustomException {
         return productService.updateQuantity(product);
     }
 
